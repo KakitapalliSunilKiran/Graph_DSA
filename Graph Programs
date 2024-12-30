@@ -1,0 +1,832 @@
+Graph :
+=================
+A graph is  acollection of nodes( Vertices) and edges (Connection between nodes) it is 
+a fundamental structure in computer science
+
+Node(Vertices) :
+================
+The points in a graph representing data or entitys
+
+Edge :
+The connection or links between thr nodes representing interactions
+
+Graphs can be classified into following types
+=============================================
+1. Undirected graph : The edges have no direction (Indirectly its a bidirectional between 2 nodes)
+
+2. Directed graph : The edges have direction (relationships or interactions in one way)
+
+3. Weighted graph :Each edge has an associated weight or cost 
+
+4. Unweight graph : which dont have any weights 
+
+
+Type of Graphs :
+Cyclic graph : A graph that contains a cycle ( a path from a node to itself)
+
+Acyclic Graph : a graph without cycles 
+
+Tree : A special type of graph with no cycles 
+
+===============================================
+
+Applications of graph :
+===================================
+
+Rapido , ola -> it will suggest the shortest graph
+ (Dikstra , Bellman ford algorithm)
+
+facebook -> Mutual friends
+
+GPS Navigatigation
+
+Traffic routing 
+
+Recommendation system
+
+Computer Networks :
+
+LAN 
+=======================
+Some Key Algorithms 
+BFS 
+DFS
+Dikstra algorithm
+Prims Algorithm
+Bellman ford algorithm
+Floyd warshall algorithm
+================================
+
+
+
+Representation of Graph
+
+Adjacency Matrix
+
+degree of the graph : Total sum of all degrees 
+===================================================
+
+//BFS Traversal of a graph
+class Solution {
+    // Function to return Breadth First Traversal of given graph.
+    public ArrayList<Integer> bfsOfGraph(int V, ArrayList<ArrayList<Integer>> adj) {
+        // code here
+        boolean vis[]=new boolean[V];
+        ArrayList<Integer> op=new ArrayList<>();
+        Queue<Integer> queue=new LinkedList<>();
+        queue.add(0);
+        vis[0]=true;
+        while(!queue.isEmpty()){
+            int i=queue.poll();
+            op.add(i);
+            for(int j=0;j<adj.get(i).size();j++){
+               int x=adj.get(i).get(j);
+               if(vis[x]==false){
+                   vis[x]=true;
+                   queue.add(x);
+               }
+            }
+            
+        }
+        return op;
+    }
+}
+=====================================================================
+//DFS Traversal of Graph
+class Solution {
+    // Function to return a list containing the DFS traversal of the graph.
+    public ArrayList<Integer> dfsOfGraph(ArrayList<ArrayList<Integer>> adj) 
+    {
+        boolean vis[]=new boolean[adj.size()];
+        ArrayList<Integer> op=new ArrayList<>();
+        int start=0;
+        vis[0]=true;
+        op.add(0);
+        dfs(adj,vis,op,start);
+        return op;
+        
+        // Code here
+    }
+    void dfs(ArrayList<ArrayList<Integer>> adj,boolean vis[], ArrayList<Integer> op,int start){
+        
+            for(int j=0;j<adj.get(start).size();j++){
+                int x=adj.get(start).get(j);
+                if(vis[x]==false){
+                     vis[x]=true;
+                      op.add(x);
+                     dfs(adj,vis,op,x);
+                }
+                
+            }
+        
+    }
+}
+=======================================================================
+//Number of Provinces
+class Solution {
+    static void dfs(int node,ArrayList<ArrayList<Integer>> adj,
+    int V,int vis[]){
+           vis[node]=1;
+           
+           for(int edge:adj.get(node)){
+                 if(vis[edge]==0){
+                     dfs(edge,adj,V,vis);
+                 }
+           }//for each
+        
+    }
+    static int numProvinces(ArrayList<ArrayList<Integer>> adj, int V) {
+        int vis[]=new int[V];
+        int cnt=0;
+        ArrayList<ArrayList<Integer>> adjj=new ArrayList<>();
+
+        for(int i=0;i<V;i++){
+            adjj.add(new ArrayList<>());
+        }
+
+
+        for(int i=0;i<V;i++){
+           for(int j=0;j<V;j++){
+               if(adj.get(i).get(j)==1 && i!=j){
+                   adjj.get(i).add(j);
+                   adjj.get(j).add(i);
+               }
+           }
+        }
+        
+        for(int i=0;i<V;i++){
+            if(vis[i]==0){
+                cnt++;
+                dfs(i,adjj,V,vis);
+            }
+        }
+        
+        return cnt;
+    }
+};
+=================================================================
+//Number of Islands
+class Solution {
+    public int numIslands(char[][] grid) {
+        // Code here
+        int count = 0;
+
+        // Traverse the entire grid
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                // If a land cell ('1') is found, increment the count
+                if (grid[i][j] == '1') {
+                    count++;
+                    // Mark the entire connected island as visited
+                    markIsland(grid, i, j);
+                }
+            }
+        }
+        return count;
+    }
+
+    // Function to mark the entire island as visited
+    private void markIsland(char[][] grid, int i, int j) {
+        // Boundary and water check
+        if (i < 0 || j < 0 || i >= grid.length || j >= grid[0].length || grid[i][j] == '0') {
+            return;
+        }
+
+        // Mark the current cell as visited
+        grid[i][j] = '0';
+
+        // All 8 possible directions (N, S, E, W, and diagonals)
+        int[][] directions = {
+            {0, 1},  // Right
+            {0, -1}, // Left
+            {1, 0},  // Down
+            {-1, 0}, // Up
+            {1, 1},  // Down-Right
+            {1, -1}, // Down-Left
+            {-1, 1}, // Up-Right
+            {-1, -1} // Up-Left
+        };
+
+        // Recursively visit all neighboring cells
+        for (int[] dir : directions) {
+            markIsland(grid, i + dir[0], j + dir[1]);
+        }
+    }
+}
+======================================================================
+// Function to detect cycle in an undirected graph using DFS.
+class Solution {
+    // Function to detect cycle in an undirected graph.
+    public boolean isCycle(ArrayList<ArrayList<Integer>> adj) {
+        // Code here
+        int V=adj.size();
+        boolean vis[]=new boolean[V];
+        
+        for(int i=0;i<V;i++){
+            if(vis[i]==false){
+               if(checkforcycle(i,-1,vis,adj)==true)
+               {
+                   return true;
+               }
+            }
+        }
+        return false;
+    }
+    boolean checkforcycle(int node,int parent , boolean vis[],ArrayList<ArrayList<Integer>> adj){
+        vis[node]=true;
+        for(Integer curr:adj.get(node)){
+            if(vis[curr]==false ){
+               boolean check= checkforcycle(curr,node,vis,adj);
+               if(check==true)
+               return true;
+            }else if(curr!=parent){
+                return true;
+            }
+        }
+        return false;
+    }
+}
+========================================================================
+import java.util.*;
+// Function to detect cycle in an undirected graph using BFS.
+class Solution {
+    public boolean isCycle(ArrayList<ArrayList<Integer>> adj) {
+        int V = adj.size();
+        boolean[] vis = new boolean[V];
+
+        // Traverse all the vertices
+        for (int i = 0; i < V; i++) {
+            if (!vis[i]) {
+                // If not visited, start BFS from this node
+                if (checkForCycleBFS(i, vis, adj)) {
+                    return true; // Cycle detected
+                }
+            }
+        }
+        return false; // No cycle detected
+    }
+
+    // BFS function to check for cycle
+    boolean checkForCycleBFS(int start, boolean[] vis, ArrayList<ArrayList<Integer>> adj) {
+        Queue<int[]> queue = new LinkedList<>();
+        queue.add(new int[] { start, -1 }); // Store node and its parent
+        vis[start] = true;
+
+        // Start BFS traversal
+        while (!queue.isEmpty()) {
+            int[] nodeInfo = queue.poll();
+            int node = nodeInfo[0]; // Current node
+            int parent = nodeInfo[1]; // Parent node
+
+            // Visit all neighbors of the current node
+            for (Integer neighbor : adj.get(node)) {
+                // If the neighbor is not visited, mark it and add to the queue
+                if (!vis[neighbor]) {
+                    vis[neighbor] = true;
+                    queue.add(new int[] { neighbor, node }); // Update the parent dynamically
+                }
+                // If the neighbor is visited and not the parent, cycle is detected
+                else if (neighbor != parent) {
+                    return true;
+                }
+            }
+        }
+        return false; // No cycle found from this starting node
+    }
+}
+=====================================================================
+//Detect a cycle in directed graph
+class Solution {
+    // Helper function to perform DFS traversal and detect cycle.
+    private boolean dfs(int node, ArrayList<ArrayList<Integer>> adj, boolean[] visited, boolean[] inStack) {
+        // Mark the node as visited and part of the recursion stack.
+        visited[node] = true;
+        inStack[node] = true;
+        
+        // Explore all the adjacent nodes (neighbors)
+        for (int neighbor : adj.get(node)) {
+            // If the neighbor is not visited, perform DFS on it
+            if (!visited[neighbor]) {
+                if (dfs(neighbor, adj, visited, inStack)) {
+                    return true;
+                }
+            }
+            // If the neighbor is in the recursion stack, a cycle is detected
+            else if (inStack[neighbor]) {
+                return true;
+            }
+        }
+        
+        // Backtrack: Remove the node from the recursion stack
+        inStack[node] = false;
+        return false;
+    }
+    
+    // Function to detect a cycle in a directed graph.
+    public boolean isCyclic(int V, ArrayList<ArrayList<Integer>> adj) {
+        // Initialize visited and inStack arrays
+        boolean[] visited = new boolean[V];
+        boolean[] inStack = new boolean[V];
+        
+        // Perform DFS for each unvisited node
+        for (int i = 0; i < V; i++) {
+            if (!visited[i]) {
+                if (dfs(i, adj, visited, inStack)) {
+                    return true; // Cycle detected
+                }
+            }
+        }
+        
+        return false; // No cycle detected
+    }
+}
+===================================================================
+//Topological Sorting
+import java.util.ArrayList;
+import java.util.Stack;
+class Solution {
+    // Helper function for DFS traversal
+    private static void dfs(int node, ArrayList<ArrayList<Integer>> adj, boolean[] visited, Stack<Integer> stack) {
+        // Mark the current node as visited
+        visited[node] = true;
+        // Traverse all the adjacent nodes of the current node
+        for (int neighbor : adj.get(node)) {
+            if (!visited[neighbor]) {
+                dfs(neighbor, adj, visited, stack);
+            }
+        }
+        // Once all neighbors are processed, add the current node to the stack
+        stack.push(node);
+    }
+    // Function to return list containing vertices in topological order
+    static ArrayList<Integer> topologicalSort(ArrayList<ArrayList<Integer>> adj) {
+        int V = adj.size(); // Number of vertices
+        boolean[] visited = new boolean[V];
+        Stack<Integer> stack = new Stack<>();
+        ArrayList<Integer> result = new ArrayList<>();
+        // Perform DFS for each node that is not visited
+        for (int i = 0; i < V; i++) {
+            if (!visited[i]) {
+                dfs(i, adj, visited, stack);
+            }
+        }
+        // Pop from the stack and add to the result list to get the topological order
+        while (!stack.isEmpty()) {
+            result.add(stack.pop());
+        }
+        return result; // The result is the topological order
+    }
+}
+================================================================================
+//Bipartite using BFS
+import java.util.*;
+class Solution {
+    // Function to check if the graph is bipartite using BFS.
+    public boolean isBipartite(ArrayList<ArrayList<Integer>> adj) {
+        int V = adj.size();
+        int[] color = new int[V];  // Array to store color of nodes (0 or 1)
+        Arrays.fill(color, -1);    // Initialize all nodes as uncolored (-1)
+
+        // Traverse all the nodes in the graph
+        for (int i = 0; i < V; i++) {
+            if (color[i] == -1) {  // If the node is not colored, perform BFS
+                if (!bfsCheckBipartite(i, adj, color)) {
+                    return false;  // If a conflict is found, the graph is not bipartite
+                }
+            }
+        }
+        return true;  // If no conflicts are found, the graph is bipartite
+    }
+
+    // BFS to check bipartiteness of the graph starting from node `src`
+    private boolean bfsCheckBipartite(int src, ArrayList<ArrayList<Integer>> adj, int[] color) {
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(src);
+        color[src] = 0;  // Start coloring the source node with color 0
+
+        // Perform BFS traversal
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+
+            // Visit all the neighbors of the current node
+            for (Integer neighbor : adj.get(node)) {
+                // If the neighbor is not colored, color it with the opposite color
+                if (color[neighbor] == -1) {
+                    color[neighbor] = 1 - color[node];  // Alternate the color
+                    queue.add(neighbor);
+                }
+                // If the neighbor is colored and has the same color as the current node, the graph is not bipartite
+                else if (color[neighbor] == color[node]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+===============================================================================
+Check for Bipartite Using DFS
+import java.util.*;
+class Solution {
+    // Function to check if the graph is bipartite using DFS.
+    public boolean isBipartite(ArrayList<ArrayList<Integer>> adj) {
+        int V = adj.size();
+        int[] color = new int[V];  // Array to store color of nodes (0 or 1)
+        Arrays.fill(color, -1);    // Initialize all nodes as uncolored (-1)
+
+        // Traverse all the nodes in the graph
+        for (int i = 0; i < V; i++) {
+            if (color[i] == -1) {  // If the node is not colored, perform DFS
+                if (!dfsCheckBipartite(i, adj, color)) {
+                    return false;  // If a conflict is found, the graph is not bipartite
+                }
+            }
+        }
+        return true;  // If no conflicts are found, the graph is bipartite
+    }
+
+    // DFS to check bipartiteness of the graph starting from node `src`
+    private boolean dfsCheckBipartite(int node, ArrayList<ArrayList<Integer>> adj, int[] color) {
+        // Visit all neighbors of the current node
+        for (Integer neighbor : adj.get(node)) {
+            // If the neighbor is not colored, color it with the opposite color
+            if (color[neighbor] == -1) {
+                color[neighbor] = 1 - color[node];  // Alternate the color
+                if (!dfsCheckBipartite(neighbor, adj, color)) {
+                    return false;  // If the neighbor's DFS shows a conflict, return false
+                }
+            }
+            // If the neighbor is colored and has the same color as the current node, the graph is not bipartite
+            else if (color[neighbor] == color[node]) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+==============================================================================
+//Shortest path using Topological Sort
+import java.util.*;
+class Solution {  
+    // Helper method for DFS-based topological sort
+    private void dfs(int node, ArrayList<ArrayList<int[]>> adj, boolean[] visited, Stack<Integer> stack) {
+        visited[node] = true;
+        
+        // Explore all neighbors of the current node
+        for (int[] neighbor : adj.get(node)) {
+            if (!visited[neighbor[0]]) { // neighbor[0] is the target node of the edge
+                dfs(neighbor[0], adj, visited, stack);
+            }
+        }
+        
+        // Push the current node to stack once all its neighbors are processed
+        stack.push(node);
+    }
+    
+    public int[] shortestPath(int V, int E, int[][] edges) {
+        // Create adjacency list representation of the graph with weights
+        ArrayList<ArrayList<int[]>> adj = new ArrayList<>();
+        for (int i = 0; i < V; i++) {
+            adj.add(new ArrayList<>());
+        }
+        
+        // Build the adjacency list with weighted edges
+        for (int i = 0; i < E; i++) {
+            int u = edges[i][0];
+            int v = edges[i][1];
+            int weight = edges[i][2];  // Assuming edges[i] = {u, v, weight}
+            adj.get(u).add(new int[]{v, weight});  // Store v and the weight of edge u -> v
+        }
+
+        // Step 1: Perform DFS to get topological order
+        Stack<Integer> stack = new Stack<>();
+        boolean[] visited = new boolean[V];
+        
+        // Perform DFS for each unvisited node to ensure all components are processed
+        for (int i = 0; i < V; i++) {
+            if (!visited[i]) {
+                dfs(i, adj, visited, stack);
+            }
+        }
+
+        // Step 2: Initialize distances and relax edges in topologically sorted order
+        int[] dist = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[0] = 0;  // Distance to the source node (0) is 0
+        
+        // Process vertices in topological order (stack gives reverse topological order)
+        while (!stack.isEmpty()) {
+            int node = stack.pop();
+            
+            // If the node is reachable
+            if (dist[node] != Integer.MAX_VALUE) {
+                // Relax all edges from the current node
+                for (int[] neighbor : adj.get(node)) {
+                    int target = neighbor[0];
+                    int weight = neighbor[1];
+                    
+                    // Relax the edge if a shorter path is found
+                    if (dist[node] + weight < dist[target]) {
+                        dist[target] = dist[node] + weight;
+                    }
+                }
+            }
+        }
+        
+        // Convert unreachable nodes (dist = Integer.MAX_VALUE) to -1
+        for (int i = 0; i < V; i++) {
+            if (dist[i] == Integer.MAX_VALUE) {
+                dist[i] = -1;
+            }
+        }
+        
+        // Return the distance array (shortest distances from node 0)
+        return dist;
+    }
+}
+================================================================
+//Dijkstra using Priority Queue
+import java.util.*;
+
+public class ShortestPath {
+
+    // Method to perform Dijkstra's algorithm
+    public static int[] dijkstra(List<List<Integer>> adj, int src, int V) {
+        // Initialize distance array with infinity
+        int[] dist = new int[V];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        dist[src] = 0;
+
+        // Priority queue (min-heap) to select the vertex with the smallest distance
+        PriorityQueue<int[]> pq = new PriorityQueue<>(Comparator.comparingInt(a -> a[0])); //Customized sorting
+        
+        // Add the source vertex to the priority queue with distance 0
+        pq.offer(new int[]{0, src});
+        
+        // Process the vertices
+        while (!pq.isEmpty()) {
+            // Extract the vertex with the minimum distance
+            int[] current = pq.poll();
+            int currentDist = current[0];
+            int u = current[1];
+
+            // Skip processing if the current distance is already greater than the recorded distance
+            if (currentDist > dist[u]) {
+                continue;
+            }
+
+            // Explore all neighbors of the current vertex
+            for (int v : adj.get(u)) {
+                int newDist = currentDist + 1;
+                
+                // If a shorter path is found, update the distance and add the neighbor to the priority queue
+                if (newDist < dist[v]) {
+                    dist[v] = newDist;
+                    pq.offer(new int[]{newDist, v});
+                }
+            }
+        }
+
+        // Replace unreachable vertices' distance with -1
+        for (int i = 0; i < V; i++) {
+            if (dist[i] == Integer.MAX_VALUE) {
+                dist[i] = -1;
+            }
+        }
+
+        return dist;
+    }
+
+    public static void main(String[] args) {
+        // Graph represented as an adjacency list
+        List<List<Integer>> adj = new ArrayList<>();
+        
+        // Initialize the adjacency list for each vertex
+        for (int i = 0; i < 9; i++) {
+            adj.add(new ArrayList<>());
+        }
+
+        // Example graph from the problem statement
+        adj.get(0).add(1);
+        adj.get(0).add(3);
+        adj.get(1).add(0);
+        adj.get(1).add(2);
+        adj.get(2).add(1);
+        adj.get(2).add(6);
+        adj.get(3).add(0);
+        adj.get(3).add(4);
+        adj.get(4).add(3);
+        adj.get(4).add(5);
+        adj.get(5).add(4);
+        adj.get(5).add(6);
+        adj.get(6).add(2);
+        adj.get(6).add(5);
+        adj.get(6).add(7);
+        adj.get(6).add(8);
+        adj.get(7).add(6);
+        adj.get(7).add(8);
+        adj.get(8).add(7);
+        adj.get(8).add(6);
+
+        int src = 0;  // Source vertex
+        int V = 9;    // Number of vertices
+        
+        // Call Dijkstra's algorithm
+        int[] result = dijkstra(adj, src, V);
+        
+        // Print the result
+        System.out.println(Arrays.toString(result));
+    }
+}
+==============================================================================
+Dijkstra Algorithm can be done in 2 ways 
+1. Priority Queue
+2. Queue
+==============================================================================
+//Bellman Ford algorithm
+class Solution {
+    static int[] bellmanFord(int V, int[][] edges, int src) {
+        // Initialize the distance array with a large value (infinity)
+        int[] dist = new int[V];
+        int INF = 100000000;  // Use a large value to represent infinity
+        for (int i = 0; i < V; i++) {
+            dist[i] = INF;
+        }
+        dist[src] = 0;  // Distance to source is 0
+
+        // Relax all edges V-1 times
+        for (int i = 0; i < V - 1; i++) {
+            for (int[] edge : edges) {
+                int u = edge[0];  // Source vertex of the edge
+                int v = edge[1];  // Destination vertex of the edge
+                int weight = edge[2];  // Weight of the edge
+
+                // Relax the edge if the path through u is shorter
+                if (dist[u] != INF && dist[u] + weight < dist[v]) {
+                    dist[v] = dist[u] + weight;
+                }
+            }
+        }
+
+        // Check for negative weight cycles
+        for (int[] edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+            int weight = edge[2];
+
+            // If we can relax any edge further, there is a negative cycle
+            if (dist[u] != INF && dist[u] + weight < dist[v]) {
+                return new int[] {-1};
+            }
+        }
+
+        // Replace unreachable vertices with INF (10^8)
+        for (int i = 0; i < V; i++) {
+            if (dist[i] == INF) {
+                dist[i] = INF;
+            }
+        }
+
+        return dist;
+    }
+}
+========================================================================================
+
+
+Priority Queue works on the Principle of min heap
+
+If any of the edge having negative weight , then this Dijkstra algorithm wont work.
+=========================================================================================
+// Floyd-Warshall Algorithm
+class Solution {
+    public void shortestDistance(int[][] mat) {
+        int V = mat.length;
+        
+        // Step 1: Initialize the matrix
+        // Treat -1 as infinity for the purpose of computation.
+        final int INF = 100000000;  // A large number to represent infinity.
+        
+        // Update matrix: If there's no edge, we use a large number (infinity).
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                if (mat[i][j] == -1 && i != j) {
+                    mat[i][j] = INF;
+                }
+            }
+        }
+        
+        // Step 2: Floyd-Warshall Algorithm
+        // The idea is to update the matrix by considering every vertex as an intermediate vertex.
+        for (int k = 0; k < V; k++) {
+            for (int i = 0; i < V; i++) {
+                for (int j = 0; j < V; j++) {
+                    if (mat[i][k] != INF && mat[k][j] != INF && mat[i][k] + mat[k][j] < mat[i][j]) {
+                        mat[i][j] = mat[i][k] + mat[k][j];
+                    }
+                }
+            }
+        }
+
+        // Step 3: Convert distances back to -1 if they are still "infinity" (no path)
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                if (mat[i][j] == INF) {
+                    mat[i][j] = -1;
+                }
+            }
+        }
+    }
+}
+=======================================================================================
+Floyd Warshallp
+MSt, PRims
+=============================
+// A Java program for Prim's Minimum Spanning Tree (MST)
+// algorithm. The program is for adjacency list
+// representation of the graph
+
+import java.io.*;
+import java.util.*;
+
+// Class to form pair
+class Pair implements Comparable<Pair>
+{
+    int v;
+    int wt;
+    Pair(int v,int wt)
+    {
+        this.v=v;
+        this.wt=wt;
+    }
+    public int compareTo(Pair that)
+    {
+        return this.wt-that.wt;
+    }
+}
+
+class GFG {
+
+// Function of spanning tree
+static int spanningTree(int V, int E, int edges[][])
+    {
+         ArrayList<ArrayList<Pair>> adj=new ArrayList<>();
+         for(int i=0;i<V;i++)
+         {
+             adj.add(new ArrayList<Pair>());
+         }
+         for(int i=0;i<edges.length;i++)
+         {
+             int u=edges[i][0];
+             int v=edges[i][1];
+             int wt=edges[i][2];
+             adj.get(u).add(new Pair(v,wt));
+             adj.get(v).add(new Pair(u,wt));
+         }
+         PriorityQueue<Pair> pq = new PriorityQueue<Pair>();
+         pq.add(new Pair(0,0));
+         int[] vis=new int[V];
+         int s=0;
+         while(!pq.isEmpty())
+         {
+             Pair node=pq.poll();
+             int v=node.v;
+             int wt=node.wt;
+             if(vis[v]==1) 
+             continue;
+             
+             s+=wt;
+             vis[v]=1;
+             for(Pair it:adj.get(v))
+             {
+                 if(vis[it.v]==0)
+                 {
+                     pq.add(new Pair(it.v,it.wt));
+                 }
+             }
+         }
+         return s;
+    }
+    
+    // Driver code
+    public static void main (String[] args) {
+        int graph[][] = new int[][] {{0,1,5},
+                                    {1,2,3},
+                                    {0,2,1}};
+ 
+        // Function call
+        System.out.println(spanningTree(3,3,graph));
+    }
+}
+===================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
